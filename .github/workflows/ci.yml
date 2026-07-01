@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Lint
+        run: flake8 api/ dashboard/ tests/
+      - name: Test
+        run: pytest tests/ -v --cov=api --cov-fail-under=75
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -f api/Dockerfile -t devops-monitor-api:ci .
+      - name: Build dashboard image
+        run: docker build -f dashboard/Dockerfile -t devops-monitor-dashboard:ci .
