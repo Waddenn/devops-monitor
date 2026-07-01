@@ -67,7 +67,13 @@ make lint
 ```
 
 The CI workflow runs the same lint and test commands, then builds both Docker
-images.
+images. On pushes to `main`, it also publishes the images to GitHub Container
+Registry:
+
+```bash
+docker pull ghcr.io/waddenn/devops-monitor-api:latest
+docker pull ghcr.io/waddenn/devops-monitor-dashboard:latest
+```
 
 ## Environment Variables
 
