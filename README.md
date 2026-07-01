@@ -12,6 +12,16 @@ servers.
 - `docker-compose.yml`: local two-service stack
 - `tests`: pytest suite with coverage
 
+```text
+devops-monitor/
+├── api/                 # FastAPI backend
+├── dashboard/           # Streamlit frontend
+├── tests/               # pytest tests
+├── docker-compose.yml   # local stack
+├── Makefile             # common commands
+└── requirements.txt     # development and CI dependencies
+```
+
 ## Prerequisites
 
 - Python 3.11
@@ -36,6 +46,9 @@ Stop the stack:
 make down
 ```
 
+The dashboard connects to the API through the Docker service name
+`http://api:8000`, not `localhost`.
+
 ## Local Development
 
 ```bash
@@ -52,6 +65,9 @@ make dev
 make test
 make lint
 ```
+
+The CI workflow runs the same lint and test commands, then builds both Docker
+images.
 
 ## Environment Variables
 
@@ -70,6 +86,17 @@ make lint
 - `GET /servers/{server_id}`
 - `DELETE /servers/{server_id}` with `X-API-Key`
 - `POST /servers/{server_id}/check`
+
+Example:
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/metrics
+curl -X POST http://localhost:8000/servers \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: change-me" \
+  -d '{"name":"httpbin","host":"httpbin.org","port":443,"tags":["demo"]}'
+```
 
 ## Notes
 
