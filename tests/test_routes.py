@@ -55,6 +55,28 @@ async def test_create_and_list_servers():
 
 
 @pytest.mark.anyio
+async def test_list_servers_can_filter_by_status():
+    server = await main.register_server(
+        ServerIn(name="api", host="httpbin.org", port=443)
+    )
+    server.status = "UP"
+
+    assert await main.list_servers(status="DOWN") == []
+    assert await main.list_servers(status="UP") == [server]
+
+
+@pytest.mark.anyio
+async def test_delete_server_removes_existing_server():
+    server = await main.register_server(
+        ServerIn(name="api", host="httpbin.org", port=443)
+    )
+
+    await main.delete_server(server.id)
+
+    assert await main.list_servers() == []
+
+
+@pytest.mark.anyio
 async def test_get_missing_server_returns_404():
     with pytest.raises(HTTPException) as exc_info:
         await main.get_server(999)
